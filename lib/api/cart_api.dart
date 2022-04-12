@@ -1,0 +1,142 @@
+import 'dart:convert';
+
+import 'package:bookmrk/constant/constant.dart';
+import 'package:bookmrk/res/utility.dart';
+import 'package:http/http.dart' as http;
+
+class CartAPI {
+  /// api for get cart details of the user ...
+  static Future getCartData(String userId) async {
+    String url =
+        "$kBaseURL/purchase/cart_view/1595922619X5f1fd8bb5f332/MOB/$userId";
+
+    Map<String, String> header = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Auth-Key": "simplerestapi",
+      "Client-Service": "frontend-client",
+    };
+
+    http.Response response = await http.get(url, headers: header);
+    print("CART RESPONSE DATA ${response.body}");
+    return jsonDecode(response.body);
+  }
+
+  static Future getApplayCoupon(String couponCode) async {
+    int userId = prefs.read<int>('userId');
+
+    String url =
+        "$kBaseURL/purchase/cart_view/1595922619X5f1fd8bb5f332/MOB/$userId/0/$couponCode";
+    print("COUPON CODE URL $url");
+    Map<String, String> header = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Auth-Key": "simplerestapi",
+      "Client-Service": "frontend-client",
+    };
+
+    http.Response response = await http.get(url, headers: header);
+    print("COUPON CODE RESPONSE ${jsonDecode(response.body)}");
+    Utility.couponCode = "";
+    return jsonDecode(response.body);
+  }
+
+  /// api to remove product from cart...
+  static Future removeCart(String userId, String cartId) async {
+    String url = "$kBaseURL/purchase/remove_cart";
+
+    Map<String, String> header = {
+      "Authorization": "\$1\$aRkFpEz3\$qGGbgw/.xtfSv8rvK/j5y0",
+      "Client-Service": "frontend-client",
+      "Auth-Key": "simplerestapi",
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+
+    Map<String, String> body = {
+      "client_key": "1595922619X5f1fd8bb5f332",
+      "device_type": "MOB",
+      "user_id": "$userId",
+      "cart_id": "$cartId",
+    };
+
+    http.Response response = await http.post(url,
+        headers: header, body: body, encoding: Encoding.getByName('utf-8'));
+    return jsonDecode(response.body);
+  }
+
+  /// api to add product in the cart....
+  static Future addProductToCart(
+    String userId,
+    String productId,
+    int qty,
+    String studentName,
+    String studentRoll,
+    String pvsmId,
+    dynamic variationInfo,
+  ) async {
+    String url = "$kBaseURL/purchase/add_to_cart";
+    Map<String, String> header = {
+      "Authorization": "\$1\$aRkFpEz3\$qGGbgw/.xtfSv8rvK/j5y0",
+      "Client-Service": "frontend-client",
+      "Auth-Key": "simplerestapi",
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+
+    Map<String, dynamic> body = {
+      "client_key": "1595922619X5f1fd8bb5f332",
+      "device_type": "MOB",
+      "user_id": "$userId",
+      "product_id": "$productId",
+      "qty": "$qty",
+      "student_name": "$studentName",
+      "student_roll": "$studentRoll",
+      "pvsm_id": "$pvsmId",
+      "variations_info": jsonEncode(variationInfo),
+      "additional_set_info": "null"
+    };
+
+    http.Response response = await http.post(
+      url,
+      headers: header,
+      body: body,
+      encoding: Encoding.getByName('utf-8'),
+    );
+
+    return jsonDecode(response.body);
+  }
+
+  static Future updateQty(
+    String userId,
+    String productId,
+    String qty,
+    String studentName,
+    String studentRoll,
+    String cartId,
+  ) async {
+    String url = "$kBaseURL/purchase/update_cart";
+    Map<String, String> header = {
+      "Authorization": "\$1\$aRkFpEz3\$qGGbgw/.xtfSv8rvK/j5y0",
+      "Client-Service": "frontend-client",
+      "Auth-Key": "simplerestapi",
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+
+    Map<String, dynamic> body = {
+      "client_key": "1595922619X5f1fd8bb5f332",
+      "device_type": "MOB",
+      "user_id": "$userId",
+      "product_id": "$productId",
+      "cart_id": "$cartId",
+      "qty": "$qty",
+      "student_name": "$studentName",
+      "student_roll": "$studentRoll",
+    };
+
+    http.Response response = await http.post(
+      url,
+      headers: header,
+      body: body,
+      encoding: Encoding.getByName('utf-8'),
+    );
+
+    return jsonDecode(response.body);
+  }
+}
